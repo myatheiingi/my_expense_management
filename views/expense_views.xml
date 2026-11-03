@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <!-- List View -->
+    <record id="view_employee_expense_list"
+            model="ir.ui.view">
+
+        <field name="name">employee.expense.list</field>
+        <field name="model">employee.expense</field>
+
+        <field name="arch" type="xml">
+            <list string="Expenses">
+
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="category"/>
+                <field name="date"/>
+                <field name="amount"/>
+                <field name="currency_id" column_invisible="True"/>
+                <field name="state" widget="badge"/>
+
+            </list>
+        </field>
+
+    </record>
+
+
+    <!-- Form View -->
+    <record id="view_employee_expense_form"
+            model="ir.ui.view">
+
+        <field name="name">employee.expense.form</field>
+        <field name="model">employee.expense</field>
+
+        <field name="arch" type="xml">
+            <form string="Expense">
+
+                <header>
+
+                    <button name="action_submit"
+                            type="object"
+                            string="Submit"
+                            class="btn-primary"
+                            invisible="state != 'draft'"/>
+
+                    <button name="action_approve"
+                            type="object"
+                            string="Approve"
+                            class="btn-primary"
+                            groups="my_expense_management.group_expense_manager"
+                            invisible="state != 'submitted'"/>
+
+                    <button name="action_reject"
+                            type="object"
+                            string="Reject"
+                            groups="my_expense_management.group_expense_manager"
+                            invisible="state != 'submitted'"/>
+
+                    <button name="action_reset"
+                            type="object"
+                            string="Reset"
+                            invisible="state not in ['submitted', 'rejected']"/>
+
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,submitted,approved,rejected"/>
+
+                </header>
+
+                <sheet>
+
+                    <div class="oe_title">
+                        <h1>
+                            <field name="name"/>
+                        </h1>
+                    </div>
+
+                    <group>
+
+                        <group>
+                            <field name="employee_id"/>
+                            <field name="category"/>
+                            <field name="date"/>
+                        </group>
+
+                        <group>
+                            <field name="amount"/>
+                            <field name="currency_id"
+                                   groups="base.group_system"/>
+                            <field name="approved_by"
+                                   readonly="1"/>
+                        </group>
+
+                    </group>
+
+                    <group>
+                        <field name="description"/>
+                    </group>
+
+                </sheet>
+
+            </form>
+        </field>
+
+    </record>
+
+
+    <!-- Search View -->
+    <record id="view_employee_expense_search"
+            model="ir.ui.view">
+
+        <field name="name">employee.expense.search</field>
+        <field name="model">employee.expense</field>
+
+        <field name="arch" type="xml">
+            <search string="Search Expenses">
+
+                <field name="name"/>
+                <field name="employee_id"/>
+                <field name="category"/>
+
+                <filter name="draft"
+                        string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+
+                <filter name="submitted"
+                        string="Submitted"
+                        domain="[('state', '=', 'submitted')]"/>
+
+                <filter name="approved"
+                        string="Approved"
+                        domain="[('state', '=', 'approved')]"/>
+
+                <filter name="rejected"
+                        string="Rejected"
+                        domain="[('state', '=', 'rejected')]"/>
+
+                <group expand="0" string="Group By">
+                    <filter name="group_employee"
+                            string="Employee"
+                            context="{'group_by': 'employee_id'}"/>
+
+                    <filter name="group_category"
+                            string="Category"
+                            context="{'group_by': 'category'}"/>
+
+                    <filter name="group_state"
+                            string="Status"
+                            context="{'group_by': 'state'}"/>
+                </group>
+
+            </search>
+        </field>
+
+    </record>
+
+
+    <!-- Window Action -->
+    <record id="action_employee_expense"
+            model="ir.actions.act_window">
+
+        <field name="name">Expenses</field>
+        <field name="res_model">employee.expense</field>
+        <field name="view_mode">list,form</field>
+        <field name="search_view_id"
+               ref="view_employee_expense_search"/>
+
+    </record>
+
+
+    <!-- Menu -->
+    <menuitem id="menu_expense_root"
+              name="Expense Management"
+              sequence="40"
+              groups="my_expense_management.group_expense_user"/>
+
+    <menuitem id="menu_employee_expense"
+              name="Expenses"
+              parent="menu_expense_root"
+              action="action_employee_expense"
+              sequence="10"
+              groups="my_expense_management.group_expense_user"/>
+
+</odoo>
